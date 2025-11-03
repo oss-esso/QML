@@ -3,6 +3,7 @@
 import logging
 from datetime import datetime, timedelta
 from typing import List, Optional, Union
+import numpy as np
 
 import pandas as pd
 import yfinance as yf
