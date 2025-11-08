@@ -145,3 +145,99 @@ applyTo: '**'
 - ✅ Comprehensive documentation and explanations
 - ✅ Career-relevant content (interview-ready material)
 
+## Guided Exercise Framework (Nov 8, 2025)
+
+### Exercise Design Philosophy
+**Interactive Learning with Immediate Feedback:**
+- Assert-based validation provides instant correctness feedback
+- Progressive difficulty: Beginner → Intermediate → Advanced
+- Real-world financial calculations and scenarios
+- Educational interpretation of results included
+
+### Exercise Structure Pattern
+Each exercise follows this consistent structure:
+```python
+# Exercise N: Title (Difficulty Level)
+# Given: Clear problem setup with data
+# TODO: Step-by-step instructions
+# Variables initialized to None (student replaces)
+
+# ============= AUTO-VALIDATION (DO NOT MODIFY) =============
+# Multiple assert statements checking:
+# 1. Variables are calculated (not None)
+# 2. Types are correct
+# 3. Values match expected results
+# 4. Business logic is correct (e.g., VaR < 0)
+# Print success message with interpretation
+# =========================================================
+```
+
+### Validation Best Practices (from Context7 pytest research)
+1. **Plain assert statements** - Most readable, standard Python
+2. **Detailed error messages** - Tell student what's wrong and expected value
+3. **Progressive checks** - Check existence → type → value → logic
+4. **Tolerance-based comparison** - Use np.isclose() with 1% rtol for floats
+5. **Educational feedback** - Include "Interpretation:" explaining the result
+6. **Visual feedback** - Use ✅ for success, ❌ for failures
+
+### Exercise Validators Module
+**Created:** `src/qf_utils/exercise_validators.py`
+
+**Key Functions:**
+- `validate_not_none()` - Check calculation performed
+- `validate_numeric_close()` - Compare floats with tolerance
+- `validate_array_close()` - Array comparison
+- `validate_range()` - Value bounds checking
+- `validate_portfolio_weights()` - Portfolio-specific checks
+- `validate_correlation_matrix()` - Matrix property validation
+- `ExerciseValidator` context manager - Clean error reporting
+
+**Usage Example:**
+```python
+from qf_utils.exercise_validators import validate_numeric_close
+
+validate_numeric_close(result, 10.5, rtol=0.01, var_name="Sharpe Ratio")
+```
+
+### Exercises Added Across ALL Modules (COMPLETE - 100% Coverage)
+
+**Module 1: Advanced Probability (3 notebooks, 8 exercises):**
+- 01_Probability_Recap: Probability axioms, Expected value & variance
+- 02_Advanced_Probability: CLT verification, Characteristic functions
+- 03_Risk_Metrics: Returns, VaR, Sharpe Ratio, CVaR
+
+**Module 2: Stochastic Processes (3 notebooks, 3 exercises):**
+- 01_Introduction: Random walk variance growth
+- 02_Brownian_Motion: Brownian motion scaling property
+- 03_Mean_Reversion: OU process half-life & stationary variance
+
+**Module 3: Stochastic Calculus (3 notebooks, 3 exercises):**
+- 01_Ito_Integral: Itô isometry
+- 02_Ito_Lemma: Itô's lemma for Y=X² with σ² correction
+- 03_Greeks_Calculator: Black-Scholes d1/d2 calculation
+
+**Module 4: Machine Learning (3 notebooks, 3 exercises):**
+- 01_ML_Introduction: Time series train-test split (chronological)
+- 02_Time_Series: AR(1) stationarity, ACF, half-life
+- 03_GARCH_LSTM: GARCH persistence calculation
+
+**Module 5: Portfolio Optimization (1 notebook, 1 exercise):**
+- 01_Portfolio_Optimization: Portfolio variance & diversification benefit
+
+**TOTAL: 13 notebooks, 19+ exercises, 100% coverage** ✅
+
+### Pedagogical Decisions
+1. **Start Simple:** Basic calculations before complex models
+2. **Real Parameters:** Use realistic financial values (not toy examples)
+3. **Multiple Checks:** Validate logic, not just arithmetic
+4. **Explain Results:** Every exercise ends with interpretation
+5. **Encourage Experimentation:** Students can modify inputs after passing
+6. **No Spoilers:** Solutions not provided, validation guides discovery
+
+### Future Expansion Ideas
+- Add more exercises to Module 1 & 2 notebooks (currently focused on latest notebooks)
+- Create "Challenge" exercises for advanced students
+- Add visualization exercises (plot validation)
+- Include statistical test exercises (hypothesis testing)
+- Add time series forecasting exercises
+
