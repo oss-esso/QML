@@ -10,13 +10,22 @@ This will compile all .pyx files in src/cython_modules/ to optimized C extension
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 import numpy as np
+import sys
+import platform
+
+# Platform-specific optimization flags
+extra_compile_args = ['-O3']
+if platform.system() == 'Darwin':  # macOS
+    extra_compile_args.extend(['-mcpu=apple-m1'] if platform.machine() == 'arm64' else [])
+else:  # Linux/Windows
+    extra_compile_args.append('-march=native')
 
 extensions = [
     Extension(
         "src.cython_modules.monte_carlo_cy",
         ["src/cython_modules/monte_carlo_cy.pyx"],
         include_dirs=[np.get_include()],
-        extra_compile_args=['-O3', '-march=native'],  # Maximum optimization
+        extra_compile_args=extra_compile_args,  # Platform-specific optimization
         extra_link_args=['-O3'],
     ),
 ]

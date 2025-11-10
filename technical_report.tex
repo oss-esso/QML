@@ -1,0 +1,542 @@
+\documentclass[12pt,a4paper]{report}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+
+% Geometry
+\geometry{margin=1in}
+
+% Header and Footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Code listing style
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{pythonstyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=Python
+}
+\lstset{style=pythonstyle}
+
+% Title information
+\title{
+    \vspace{-2cm}
+    \Huge \textbf{Advanced Quantitative Finance:} \\
+    \LARGE \textbf{From Probability Theory to Portfolio Optimization} \\
+    \vspace{0.5cm}
+    \Large A Comprehensive Technical and Theoretical Report
+}
+\author{
+    \Large Edoardo Spigarolo \\
+    \normalsize Transitioning from Quantum Physics to Quantitative Finance
+}
+\date{\today}
+
+% Custom commands
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\text{Var}}
+\newcommand{\Cov}{\text{Cov}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\convergesto}{\xrightarrow{}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This technical report provides a comprehensive treatment of advanced probability theory, stochastic processes, stochastic calculus, machine learning, and portfolio optimization with applications to quantitative finance. The document synthesizes theoretical foundations with practical implementations using real financial data, covering topics essential for quantitative analysts, risk managers, and financial engineers.
+
+The report is organized into five main modules: (1) Advanced Probability and Risk Metrics, (2) Stochastic Processes and Mean Reversion, (3) Stochastic Calculus and Option Pricing, (4) Machine Learning for Financial Time Series, and (5) Portfolio Optimization and Risk Management. Each module integrates rigorous mathematical theory with computational methods implemented in Python, demonstrating best practices from industry-standard libraries including NumPy, pandas, scipy, statsmodels, yfinance, ARCH, and TensorFlow.
+
+All theoretical results are supported by real-world financial applications, including Value-at-Risk (VaR) calculation, pairs trading strategies, option Greeks computation with implied volatility surfaces, GARCH volatility modeling, LSTM neural networks for forecasting, and Markowitz mean-variance optimization. The report serves as both a learning resource and a reference guide for quantitative finance practitioners.
+\end{abstract}
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\chapter{Advanced Probability Theory and Financial Risk Metrics}
+\label{ch:probability}
+
+\section{Introduction}
+\label{sec:prob_intro}
+
+Probability theory forms the mathematical foundation of quantitative finance. Understanding the behavior of random variables, their distributions, and limit theorems is essential for modeling asset returns, pricing derivatives, and managing financial risk. This chapter provides a comprehensive treatment of probability theory with specific emphasis on applications to financial markets.
+
+\section{Fundamental Probability Concepts}
+\label{sec:fundamentals}
+
+\subsection{Probability Spaces}
+\label{subsec:prob_spaces}
+
+\begin{definition}[Probability Space]
+A probability space is a triple $(\Omega, \mathcal{F}, \Prob)$ where:
+\begin{itemize}
+    \item $\Omega$ is the sample space, representing all possible outcomes
+    \item $\mathcal{F}$ is a $\sigma$-algebra of events, a collection of subsets of $\Omega$ that includes $\Omega$ itself, is closed under complementation, and is closed under countable unions
+    \item $\Prob: \mathcal{F} \to [0,1]$ is a probability measure satisfying the Kolmogorov axioms
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Kolmogorov Axioms]
+A probability measure $\Prob$ satisfies the following axioms:
+\begin{enumerate}
+    \item \textbf{Non-negativity:} $\Prob(E) \geq 0$ for any event $E \in \mathcal{F}$
+    \item \textbf{Normalization:} $\Prob(\Omega) = 1$
+    \item \textbf{Countable Additivity:} For any countable sequence of disjoint events $\{E_i\}_{i=1}^{\infty}$,
+    \[
+    \Prob\left(\bigcup_{i=1}^{\infty} E_i\right) = \sum_{i=1}^{\infty} \Prob(E_i)
+    \]
+\end{enumerate}
+\end{theorem}
+
+\subsection{Random Variables and Distributions}
+\label{subsec:random_variables}
+
+\begin{definition}[Random Variable]
+A random variable $X$ is a measurable function from the sample space $\Omega$ to the real numbers $\R$, i.e., $X: \Omega \to \R$ such that for every Borel set $B \subseteq \R$, the pre-image $X^{-1}(B) \in \mathcal{F}$.
+\end{definition}
+
+Random variables are classified as discrete or continuous:
+
+\begin{itemize}
+    \item \textbf{Discrete Random Variables:} Take values in a countable set. The probability mass function (PMF) is defined as $p(x) = \Prob(X = x)$.
+    
+    \item \textbf{Continuous Random Variables:} Can take any value in an interval. The probability density function (PDF) $f(x)$ satisfies:
+    \[
+    \Prob(a \leq X \leq b) = \int_a^b f(x) \, dx
+    \]
+\end{itemize}
+
+\subsection{Key Probability Distributions in Finance}
+\label{subsec:distributions}
+
+\subsubsection{Normal Distribution}
+
+The normal (Gaussian) distribution is fundamental in finance, forming the basis of many models.
+
+\begin{definition}[Normal Distribution]
+A random variable $X$ follows a normal distribution with mean $\mu$ and variance $\sigma^2$, denoted $X \sim \N(\mu, \sigma^2)$, if its PDF is:
+\[
+f(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right), \quad x \in \R
+\]
+\end{definition}
+
+\textbf{Properties:}
+\begin{itemize}
+    \item Symmetric around the mean $\mu$
+    \item 68\% of probability mass within $\mu \pm \sigma$
+    \item 95\% within $\mu \pm 2\sigma$
+    \item 99.7\% within $\mu \pm 3\sigma$ (three-sigma rule)
+\end{itemize}
+
+\subsubsection{Student's t-Distribution}
+
+Financial returns often exhibit heavier tails than the normal distribution, making the Student's t-distribution more appropriate for modeling extreme events.
+
+\begin{definition}[Student's t-Distribution]
+A random variable $T$ follows a Student's t-distribution with $\nu$ degrees of freedom if its PDF is:
+\[
+f(t) = \frac{\Gamma\left(\frac{\nu+1}{2}\right)}{\sqrt{\nu\pi}\,\Gamma\left(\frac{\nu}{2}\right)} \left(1 + \frac{t^2}{\nu}\right)^{-\frac{\nu+1}{2}}
+\]
+where $\Gamma(\cdot)$ is the gamma function.
+\end{definition}
+
+\textbf{Properties:}
+\begin{itemize}
+    \item Heavier tails than normal distribution
+    \item As $\nu \to \infty$, converges to standard normal
+    \item Better captures extreme market movements (fat tails)
+\end{itemize}
+
+\section{Moments and Generating Functions}
+\label{sec:moments}
+
+\subsection{Expected Value and Variance}
+\label{subsec:expectation}
+
+\begin{definition}[Expected Value]
+The expected value (mean) of a random variable $X$ is:
+\[
+\E[X] = \begin{cases}
+\sum_x x \cdot p(x) & \text{if } X \text{ is discrete} \\
+\int_{-\infty}^{\infty} x \cdot f(x) \, dx & \text{if } X \text{ is continuous}
+\end{cases}
+\]
+\end{definition}
+
+\begin{definition}[Variance]
+The variance of $X$ measures dispersion around the mean:
+\[
+\Var(X) = \E[(X - \E[X])^2] = \E[X^2] - (\E[X])^2
+\]
+The standard deviation is $\sigma = \sqrt{\Var(X)}$.
+\end{definition}
+
+\textbf{Properties of Expectation:}
+\begin{itemize}
+    \item Linearity: $\E[aX + bY] = a\E[X] + b\E[Y]$
+    \item For independent $X$ and $Y$: $\E[XY] = \E[X]\E[Y]$
+\end{itemize}
+
+\textbf{Properties of Variance:}
+\begin{itemize}
+    \item $\Var(aX + b) = a^2\Var(X)$
+    \item For independent $X$ and $Y$: $\Var(X + Y) = \Var(X) + \Var(Y)$
+\end{itemize}
+
+\subsection{Higher Moments: Skewness and Kurtosis}
+\label{subsec:higher_moments}
+
+\begin{definition}[Skewness]
+Skewness measures asymmetry of a distribution:
+\[
+\text{Skew}(X) = \E\left[\left(\frac{X - \mu}{\sigma}\right)^3\right] = \frac{\E[(X-\mu)^3]}{\sigma^3}
+\]
+\end{definition}
+
+\begin{itemize}
+    \item Skew $> 0$: Right tail (positive skew)
+    \item Skew $< 0$: Left tail (negative skew)
+    \item Skew $= 0$: Symmetric (e.g., normal distribution)
+\end{itemize}
+
+\textbf{Financial Interpretation:} Negative skewness in return distributions indicates higher probability of large losses than large gains, a common feature in equity markets.
+
+\begin{definition}[Kurtosis]
+Kurtosis measures tail heaviness (excess kurtosis is relative to normal distribution):
+\[
+\text{Kurt}(X) = \E\left[\left(\frac{X - \mu}{\sigma}\right)^4\right] - 3
+\]
+\end{definition}
+
+\begin{itemize}
+    \item Kurt $> 0$: Leptokurtic (fat tails, more peaked)
+    \item Kurt $< 0$: Platykurtic (thin tails, flatter)
+    \item Kurt $= 0$: Mesokurtic (normal distribution)
+\end{itemize}
+
+\textbf{Financial Interpretation:} Positive excess kurtosis indicates higher probability of extreme events (both positive and negative), which is critical for risk management.
+
+\subsection{Characteristic Functions}
+\label{subsec:characteristic_functions}
+
+\begin{definition}[Characteristic Function]
+The characteristic function of a random variable $X$ is defined as:
+\[
+\phi_X(t) = \E[e^{itX}] = \int_{-\infty}^{\infty} e^{itx} f(x) \, dx
+\]
+where $i = \sqrt{-1}$ is the imaginary unit.
+\end{definition}
+
+\textbf{Properties:}
+\begin{enumerate}
+    \item $\phi_X(0) = 1$
+    \item $|\phi_X(t)| \leq 1$ for all $t \in \R$
+    \item Uniquely determines the distribution
+    \item For independent $X$ and $Y$: $\phi_{X+Y}(t) = \phi_X(t)\phi_Y(t)$
+\end{enumerate}
+
+\begin{example}[Standard Normal Characteristic Function]
+For $X \sim \N(0,1)$:
+\[
+\phi_X(t) = \exp\left(-\frac{t^2}{2}\right)
+\]
+\end{example}
+
+\section{Limit Theorems}
+\label{sec:limit_theorems}
+
+\subsection{Law of Large Numbers}
+\label{subsec:lln}
+
+\begin{theorem}[Weak Law of Large Numbers]
+Let $\{X_i\}_{i=1}^{\infty}$ be a sequence of independent and identically distributed (i.i.d.) random variables with finite mean $\mu = \E[X_i]$. Let $\bar{X}_n = \frac{1}{n}\sum_{i=1}^n X_i$. Then for any $\epsilon > 0$:
+\[
+\lim_{n \to \infty} \Prob(|\bar{X}_n - \mu| > \epsilon) = 0
+\]
+\end{theorem}
+
+\begin{theorem}[Strong Law of Large Numbers]
+Under the same conditions:
+\[
+\Prob\left(\lim_{n \to \infty} \bar{X}_n = \mu\right) = 1
+\]
+\end{theorem}
+
+\textbf{Financial Application:} The LLN justifies the use of sample averages to estimate population means, such as estimating expected returns from historical data.
+
+\subsection{Central Limit Theorem}
+\label{subsec:clt}
+
+\begin{theorem}[Central Limit Theorem]
+Let $\{X_i\}_{i=1}^{\infty}$ be i.i.d. random variables with mean $\mu$ and variance $\sigma^2 < \infty$. Define:
+\[
+S_n = \sum_{i=1}^n X_i, \quad Z_n = \frac{S_n - n\mu}{\sigma\sqrt{n}} = \frac{\bar{X}_n - \mu}{\sigma/\sqrt{n}}
+\]
+Then as $n \to \infty$:
+\[
+Z_n \convergesto^d \N(0,1)
+\]
+where $\convergesto^d$ denotes convergence in distribution.
+\end{theorem}
+
+\textbf{Financial Application:} The CLT explains why returns aggregated over time tend toward normality, and justifies the use of normal distributions in many financial models despite individual returns being non-normal.
+
+\begin{remark}
+The CLT holds even when the underlying distribution is not normal, provided the variance is finite. This is powerful because many financial variables (e.g., daily returns) may not be normal, but their sums or averages approximate normality.
+\end{remark}
+
+\section{Conditional Expectation and Martingales}
+\label{sec:conditional}
+
+\subsection{Conditional Expectation}
+\label{subsec:cond_expectation}
+
+\begin{definition}[Conditional Expectation]
+The conditional expectation of $Y$ given $X$, denoted $\E[Y|X]$, is a random variable that represents the expected value of $Y$ given knowledge of $X$.
+\end{definition}
+
+\textbf{Properties:}
+\begin{enumerate}
+    \item Tower Property: $\E[\E[Y|X]] = \E[Y]$
+    \item Linearity: $\E[aY_1 + bY_2|X] = a\E[Y_1|X] + b\E[Y_2|X]$
+    \item If $Y$ is independent of $X$: $\E[Y|X] = \E[Y]$
+\end{enumerate}
+
+\subsection{Filtrations and Martingales}
+\label{subsec:martingales}
+
+\begin{definition}[Filtration]
+A filtration $\{\mathcal{F}_t\}_{t \geq 0}$ is an increasing family of $\sigma$-algebras representing the information available up to time $t$:
+\[
+\mathcal{F}_s \subseteq \mathcal{F}_t \quad \text{for all } s \leq t
+\]
+\end{definition}
+
+\begin{definition}[Martingale]
+A stochastic process $\{M_t\}_{t \geq 0}$ is a martingale with respect to filtration $\{\mathcal{F}_t\}$ if:
+\begin{enumerate}
+    \item $M_t$ is $\mathcal{F}_t$-measurable for all $t$
+    \item $\E[|M_t|] < \infty$ for all $t$
+    \item $\E[M_t|\mathcal{F}_s] = M_s$ for all $s \leq t$
+\end{enumerate}
+\end{definition}
+
+\textbf{Financial Interpretation:} In efficient markets, asset prices discounted by the risk-free rate form a martingale—the best predictor of tomorrow's price is today's price (the "fair game" property).
+
+\begin{example}[Random Walk as Martingale]
+Let $\{Z_i\}$ be i.i.d. with $\E[Z_i] = 0$. Define $S_n = \sum_{i=1}^n Z_i$. Then $\{S_n\}$ is a martingale because:
+\[
+\E[S_{n+1}|\mathcal{F}_n] = \E[S_n + Z_{n+1}|\mathcal{F}_n] = S_n + \E[Z_{n+1}] = S_n
+\]
+\end{example}
+
+This completes the foundational probability theory. The next sections will apply these concepts to financial risk metrics.
+
+\section{Value-at-Risk (VaR)}
+\label{sec:var}
+
+Value-at-Risk is the most widely used risk measure in finance, quantifying the maximum expected loss over a given time horizon at a specified confidence level.
+
+\subsection{Definition and Interpretation}
+\label{subsec:var_definition}
+
+\begin{definition}[Value-at-Risk]
+For a random loss $L$ (where positive values represent losses), the Value-at-Risk at confidence level $\alpha \in (0,1)$ is the $\alpha$-quantile:
+\[
+\text{VaR}_\alpha(L) = \inf\{l \in \R : \Prob(L \leq l) \geq \alpha\} = F_L^{-1}(\alpha)
+\]
+\end{definition}
+
+Equivalently, for a portfolio with return $R$:
+\[
+\text{VaR}_\alpha = -\inf\{r : \Prob(R \leq r) \geq 1-\alpha\}
+\]
+
+\textbf{Interpretation:} VaR$_{0.95}$ = \$1M means: "We are 95\% confident that losses will not exceed \$1M over the given horizon."
+
+\subsection{VaR Calculation Methods}
+\label{subsec:var_methods}
+
+\subsubsection{Historical VaR}
+
+Uses empirical distribution of historical returns:
+\[
+\text{VaR}_\alpha^{\text{hist}} = -Q_{\alpha}(\{r_1, r_2, \ldots, r_n\})
+\]
+where $Q_{\alpha}$ is the $\alpha$-quantile of the sample.
+
+\textbf{Advantages:}
+\begin{itemize}
+    \item No distributional assumptions
+    \item Captures fat tails and skewness
+\end{itemize}
+
+\textbf{Disadvantages:}
+\begin{itemize}
+    \item Limited by historical data (no scenarios outside sample)
+    \item Assumes past is representative of future
+\end{itemize}
+
+\subsubsection{Parametric VaR (Variance-Covariance Method)}
+
+Assumes returns follow a normal distribution $R \sim \N(\mu, \sigma^2)$:
+\[
+\text{VaR}_\alpha^{\text{param}} = -(\mu + \sigma \Phi^{-1}(1-\alpha))
+\]
+where $\Phi^{-1}$ is the inverse standard normal CDF.
+
+\textbf{Example:} For daily returns with $\mu = 0.0005$, $\sigma = 0.02$, and $\alpha = 0.95$:
+\[
+\text{VaR}_{0.95} = -(0.0005 + 0.02 \times (-1.645)) = 0.0324 \text{ or } 3.24\%
+\]
+
+\textbf{Advantages:}
+\begin{itemize}
+    \item Simple and fast to compute
+    \item Analytically tractable
+\end{itemize}
+
+\textbf{Disadvantages:}
+\begin{itemize}
+    \item Underestimates risk if returns are fat-tailed
+    \item Inappropriate for non-linear portfolios (options)
+\end{itemize}
+
+\subsubsection{Cornish-Fisher VaR}
+
+Adjusts for skewness ($S$) and excess kurtosis ($K$):
+\[
+z_{\text{CF}} = z_\alpha + \frac{(z_\alpha^2 - 1)S}{6} + \frac{(z_\alpha^3 - 3z_\alpha)K}{24} - \frac{(2z_\alpha^3 - 5z_\alpha)S^2}{36}
+\]
+\[
+\text{VaR}_\alpha^{\text{CF}} = -(\mu + \sigma z_{\text{CF}})
+\]
+
+This provides better estimates for non-normal distributions.
+
+\subsection{Conditional VaR (Expected Shortfall)}
+\label{subsec:cvar}
+
+\begin{definition}[Conditional VaR / Expected Shortfall]
+CVaR (also called Expected Shortfall or ES) is the expected loss given that we are in the tail beyond VaR:
+\[
+\text{CVaR}_\alpha = \E[L | L > \text{VaR}_\alpha]
+\]
+\end{definition}
+
+For a normal distribution:
+\[
+\text{CVaR}_\alpha = -\left(\mu + \sigma \frac{\phi(\Phi^{-1}(1-\alpha))}{1-\alpha}\right)
+\]
+where $\phi$ is the standard normal PDF.
+
+\textbf{Advantages over VaR:}
+\begin{itemize}
+    \item Coherent risk measure (satisfies sub-additivity)
+    \item Captures tail risk beyond VaR
+    \item Preferred by Basel III regulations
+\end{itemize}
+
+\section{Risk-Adjusted Performance Metrics}
+\label{sec:risk_adjusted}
+
+\subsection{Sharpe Ratio}
+\label{subsec:sharpe}
+
+\begin{definition}[Sharpe Ratio]
+The Sharpe ratio measures excess return per unit of risk:
+\[
+\text{Sharpe} = \frac{\E[R - R_f]}{\sigma_{R-R_f}} \approx \frac{\bar{R} - R_f}{\sigma_R}
+\]
+where $R$ is the portfolio return, $R_f$ is the risk-free rate, and $\sigma_R$ is the portfolio volatility.
+\end{definition}
+
+\textbf{Interpretation:} Sharpe ratio of 1.5 means the portfolio generates 1.5 units of excess return for each unit of risk.
+
+\textbf{Annualization:} For daily returns:
+\[
+\text{Sharpe}_{\text{annual}} = \sqrt{252} \times \text{Sharpe}_{\text{daily}}
+\]
+
+\subsection{Sortino Ratio}
+\label{subsec:sortino}
+
+\begin{definition}[Sortino Ratio]
+The Sortino ratio uses only downside deviation:
+\[
+\text{Sortino} = \frac{\E[R - R_f]}{\sigma_{\text{down}}}
+\]
+where $\sigma_{\text{down}} = \sqrt{\E[(R - R_f)^2 \cdot \mathbb{1}_{R < R_f}]}$ is the downside semi-deviation.
+\end{definition}
+
+\textbf{Advantage:} Focuses only on harmful volatility (downside), which is more relevant for risk-averse investors.
+
+\subsection{Maximum Drawdown}
+\label{subsec:mdd}
+
+\begin{definition}[Maximum Drawdown]
+The maximum drawdown measures the largest peak-to-trough decline:
+\[
+\text{MDD} = \max_{0 \leq s \leq t \leq T} \frac{V(s) - V(t)}{V(s)}
+\]
+where $V(t)$ is the portfolio value at time $t$.
+\end{definition}
+
+\textbf{Interpretation:} MDD = 30\% means the portfolio lost 30\% from its peak value before recovering.
+
+This chapter has established the probabilistic foundations and introduced key risk metrics. The next chapter will extend these concepts to dynamic processes evolving in time.
+
+\end{document}

@@ -1,0 +1,731 @@
+\chapter{Portfolio Optimization and Risk Management}
+\label{ch:portfolio}
+
+\section{Introduction to Portfolio Theory}
+\label{sec:portfolio_intro}
+
+Portfolio optimization is the process of selecting asset weights to maximize returns for a given level of risk, or equivalently, minimize risk for a target return. This chapter develops the mathematical framework of Modern Portfolio Theory and its extensions.
+
+\subsection{Historical Context}
+\label{subsec:historical}
+
+\textbf{Markowitz (1952):} Introduced mean-variance optimization, founding Modern Portfolio Theory (MPT). Key insight: diversification reduces risk.
+
+\textbf{Sharpe (1964):} Developed Capital Asset Pricing Model (CAPM).
+
+\textbf{Black-Litterman (1992):} Bayesian approach combining market equilibrium with investor views.
+
+\section{Mean-Variance Optimization}
+\label{sec:mean_variance}
+
+\subsection{Framework and Notation}
+\label{subsec:framework}
+
+Consider $n$ risky assets with:
+\begin{itemize}
+    \item Returns: $r = (r_1, \ldots, r_n)^T$
+    \item Expected returns: $\mu = \E[r] = (\mu_1, \ldots, \mu_n)^T$
+    \item Covariance matrix: $\Sigma = \Cov(r) = \E[(r-\mu)(r-\mu)^T]$
+    \item Portfolio weights: $w = (w_1, \ldots, w_n)^T$
+\end{itemize}
+
+\textbf{Portfolio Return and Risk:}
+\begin{align}
+r_p &= w^T r \\
+\mu_p &= w^T \mu \\
+\sigma_p^2 &= w^T \Sigma w
+\end{align}
+
+\subsection{The Mean-Variance Problem}
+\label{subsec:mv_problem}
+
+\begin{definition}[Minimum Variance Portfolio]
+\begin{align}
+\min_w \quad & \frac{1}{2} w^T \Sigma w \\
+\text{s.t.} \quad & w^T \mathbf{1} = 1
+\end{align}
+where $\mathbf{1} = (1, \ldots, 1)^T$ is the vector of ones.
+\end{definition}
+
+\begin{definition}[Efficient Portfolio]
+For target return $\mu_{\text{target}}$:
+\begin{align}
+\min_w \quad & \frac{1}{2} w^T \Sigma w \\
+\text{s.t.} \quad & w^T \mu = \mu_{\text{target}} \\
+& w^T \mathbf{1} = 1
+\end{align}
+\end{definition}
+
+\subsection{Analytical Solution}
+\label{subsec:analytical_solution}
+
+Using Lagrange multipliers for the unconstrained minimum variance portfolio:
+\[
+\mathcal{L} = \frac{1}{2}w^T\Sigma w - \lambda(w^T\mathbf{1} - 1)
+\]
+
+First-order conditions:
+\[
+\Sigma w = \lambda \mathbf{1}
+\]
+
+Solution:
+\[
+w_{\text{mv}} = \frac{\Sigma^{-1}\mathbf{1}}{\mathbf{1}^T\Sigma^{-1}\mathbf{1}}
+\]
+
+For target return $\mu_p$:
+\[
+w^* = \frac{A\Sigma^{-1}\mathbf{1} - B\Sigma^{-1}\mu + C\mu_p(\Sigma^{-1}\mu - B\Sigma^{-1}\mathbf{1})}{AC - B^2}
+\]
+where:
+\begin{align}
+A &= \mathbf{1}^T\Sigma^{-1}\mathbf{1} \\
+B &= \mathbf{1}^T\Sigma^{-1}\mu \\
+C &= \mu^T\Sigma^{-1}\mu
+\end{align}
+
+\subsection{The Efficient Frontier}
+\label{subsec:efficient_frontier}
+
+\begin{definition}[Efficient Frontier]
+The set of all efficient portfolios (minimum variance for each target return level):
+\[
+\mathcal{E} = \{(w^T\mu, \sqrt{w^T\Sigma w}) : w \text{ solves the MVO problem}\}
+\]
+\end{definition}
+
+\textbf{Properties:}
+\begin{itemize}
+    \item Hyperbola in $(\sigma_p, \mu_p)$ space
+    \item Upper branch is efficient (dominated strategies below)
+    \item All efficient portfolios are linear combinations of any two efficient portfolios (two-fund separation)
+\end{itemize}
+
+\begin{theorem}[Two-Fund Separation]
+Any efficient portfolio can be written as:
+\[
+w = \alpha w_1 + (1-\alpha)w_2
+\]
+where $w_1$ and $w_2$ are any two distinct efficient portfolios.
+\end{theorem}
+
+\subsection{Including the Risk-Free Asset}
+\label{subsec:risk_free}
+
+With a risk-free asset yielding $r_f$, the efficient frontier becomes a line: the Capital Market Line (CML).
+
+\begin{definition}[Tangency Portfolio]
+The portfolio of risky assets with maximum Sharpe ratio:
+\begin{align}
+\max_w \quad & \frac{w^T\mu - r_f}{\sqrt{w^T\Sigma w}} \\
+\text{s.t.} \quad & w^T\mathbf{1} = 1
+\end{align}
+\end{definition}
+
+Solution:
+\[
+w_{\text{tan}} = \frac{\Sigma^{-1}(\mu - r_f\mathbf{1})}{\mathbf{1}^T\Sigma^{-1}(\mu - r_f\mathbf{1})}
+\]
+
+\begin{theorem}[Mutual Fund Theorem]
+All investors should hold the same portfolio of risky assets (the tangency portfolio), varying only the allocation between this portfolio and the risk-free asset.
+\end{theorem}
+
+\section{Extensions and Constraints}
+\label{sec:extensions}
+
+\subsection{No Short-Selling Constraints}
+\label{subsec:no_short}
+
+Add non-negativity constraints:
+\begin{align}
+\min_w \quad & \frac{1}{2} w^T \Sigma w \\
+\text{s.t.} \quad & w^T \mu = \mu_p \\
+& w^T \mathbf{1} = 1 \\
+& w \geq 0
+\end{align}
+
+Requires quadratic programming (no closed-form solution).
+
+\textbf{Active Constraints:} At optimum, some weights will be exactly zero (sparse portfolio).
+
+\subsection{Position Limits and Constraints}
+\label{subsec:constraints}
+
+\textbf{Box constraints:}
+\[
+l_i \leq w_i \leq u_i, \quad i = 1, \ldots, n
+\]
+
+\textbf{Sector constraints:}
+\[
+\sum_{i \in S_k} w_i \leq c_k
+\]
+where $S_k$ is the set of assets in sector $k$.
+
+\textbf{Turnover constraints:}
+\[
+\sum_{i=1}^n |w_i - w_i^{\text{old}}| \leq \tau
+\]
+
+\subsection{Transaction Costs}
+\label{subsec:transaction_costs}
+
+With proportional costs $c_i$ per dollar traded:
+\[
+\text{Cost} = \sum_{i=1}^n c_i |w_i - w_i^{\text{old}}| \cdot \text{Portfolio Value}
+\]
+
+Optimization becomes:
+\[
+\max_w \quad w^T\mu - \lambda w^T\Sigma w - \sum_{i=1}^n c_i |w_i - w_i^{\text{old}}|
+\]
+
+Leads to infrequent rebalancing (optimal to stay within "no-trade" region).
+
+\section{Risk Parity}
+\label{sec:risk_parity}
+
+\subsection{Concept}
+\label{subsec:risk_parity_concept}
+
+Equal risk contribution from each asset, rather than equal weights.
+
+\begin{definition}[Marginal Risk Contribution]
+\[
+\text{MRC}_i = \frac{\partial \sigma_p}{\partial w_i} = \frac{(\Sigma w)_i}{\sigma_p}
+\]
+\end{definition}
+
+\begin{definition}[Risk Contribution]
+\[
+\text{RC}_i = w_i \cdot \text{MRC}_i = \frac{w_i (\Sigma w)_i}{\sigma_p}
+\]
+\end{definition}
+
+Note: $\sum_{i=1}^n \text{RC}_i = \sigma_p$ (Euler's theorem for homogeneous functions).
+
+\subsection{Risk Parity Optimization}
+\label{subsec:risk_parity_opt}
+
+\begin{definition}[Risk Parity Portfolio]
+Find weights such that:
+\[
+\text{RC}_1 = \text{RC}_2 = \cdots = \text{RC}_n = \frac{\sigma_p}{n}
+\]
+\end{definition}
+
+Equivalently, solve:
+\begin{align}
+\min_w \quad & \sum_{i=1}^n \sum_{j=1}^n (\text{RC}_i - \text{RC}_j)^2 \\
+\text{s.t.} \quad & w^T\mathbf{1} = 1, \quad w \geq 0
+\end{align}
+
+\textbf{Properties:}
+\begin{itemize}
+    \item Diversifies risk across assets
+    \item Weights inversely proportional to volatility (roughly)
+    \item Less concentrated than MVO (more stable)
+    \item Does not use expected returns (robust to estimation error)
+\end{itemize}
+
+\section{Estimation Issues and Robust Methods}
+\label{sec:estimation}
+
+\subsection{Estimation Error Problem}
+\label{subsec:estimation_error}
+
+MVO is highly sensitive to estimation errors in $\mu$ and $\Sigma$.
+
+\textbf{Error Magnification:}
+\begin{itemize}
+    \item Small errors in $\mu$ lead to extreme weights
+    \item Optimizer exploits estimation errors
+    \item Out-of-sample performance degrades
+\end{itemize}
+
+\textbf{Sources of Error:}
+\begin{itemize}
+    \item Limited historical data
+    \item Non-stationarity
+    \item Structural breaks
+\end{itemize}
+
+\subsection{Shrinkage Estimators}
+\label{subsec:shrinkage}
+
+\subsubsection{Covariance Shrinkage}
+
+Ledoit-Wolf shrinkage:
+\[
+\hat{\Sigma}_{\text{shrink}} = \delta F + (1-\delta)\hat{\Sigma}_{\text{sample}}
+\]
+where $F$ is a structured target (e.g., identity matrix, constant correlation).
+
+Optimal shrinkage intensity $\delta$ minimizes MSE.
+
+\subsubsection{Mean Shrinkage}
+
+James-Stein estimator shrinks toward global mean:
+\[
+\hat{\mu}_i^{\text{JS}} = \bar{\mu} + \left(1 - \frac{(n-2)\sigma^2}{\|\hat{\mu} - \bar{\mu}\mathbf{1}\|^2}\right)(\hat{\mu}_i - \bar{\mu})
+\]
+
+\subsection{Black-Litterman Model}
+\label{subsec:black_litterman}
+
+Combines market equilibrium with investor views using Bayesian inference.
+
+\textbf{Market Equilibrium (Prior):}
+\[
+\Pi = \lambda \Sigma w_{\text{mkt}}
+\]
+where $\Pi$ is the vector of implied returns, $\lambda$ is risk aversion, $w_{\text{mkt}}$ is market capitalization weights.
+
+\textbf{Investor Views:}
+\[
+P\mu = Q + \epsilon, \quad \epsilon \sim \N(0, \Omega)
+\]
+where $P$ is a $k \times n$ matrix encoding views, $Q$ is the $k$-vector of view returns.
+
+\textbf{Posterior (Black-Litterman Expected Returns):}
+\[
+\E[\mu | \text{views}] = [(\tau\Sigma)^{-1} + P^T\Omega^{-1}P]^{-1}[(\tau\Sigma)^{-1}\Pi + P^T\Omega^{-1}Q]
+\]
+
+\textbf{Advantages:}
+\begin{itemize}
+    \item Incorporates market information
+    \item Allows expressing views with uncertainty
+    \item Produces more diversified portfolios
+    \item Stable to small changes in inputs
+\end{itemize}
+
+\subsection{Resampled Efficiency}
+\label{subsec:resampled}
+
+Michaud's resampled efficient frontier:
+\begin{enumerate}
+    \item Bootstrap historical data $B$ times
+    \item Compute efficient frontier for each bootstrap sample
+    \item Average weights across frontiers
+\end{enumerate}
+
+Reduces estimation error but introduces bias.
+
+\section{Factor Models}
+\label{sec:factor_models}
+
+\subsection{Single-Factor CAPM}
+\label{subsec:capm}
+
+\begin{equation}
+r_i - r_f = \alpha_i + \beta_i(r_m - r_f) + \epsilon_i
+\end{equation}
+
+\begin{itemize}
+    \item $\beta_i = \frac{\Cov(r_i, r_m)}{\Var(r_m)}$: systematic risk
+    \item $\alpha_i$: excess return (should be zero in equilibrium)
+    \item $\epsilon_i$: idiosyncratic risk
+\end{itemize}
+
+\textbf{Portfolio beta:}
+\[
+\beta_p = \sum_{i=1}^n w_i \beta_i
+\]
+
+\subsection{Multi-Factor Models}
+\label{subsec:multifactor}
+
+\subsubsection{Fama-French Three-Factor Model}
+
+\[
+r_i - r_f = \alpha_i + \beta_i^M(r_m - r_f) + \beta_i^{SMB}\text{SMB} + \beta_i^{HML}\text{HML} + \epsilon_i
+\]
+
+Factors:
+\begin{itemize}
+    \item Market: $r_m - r_f$
+    \item Size: SMB (Small Minus Big)
+    \item Value: HML (High Minus Low book-to-market)
+\end{itemize}
+
+\subsubsection{Carhart Four-Factor Model}
+
+Adds momentum:
+\[
++ \beta_i^{MOM}\text{MOM}
+\]
+
+\subsubsection{Fama-French Five-Factor Model}
+
+Adds profitability and investment:
+\[
++ \beta_i^{RMW}\text{RMW} + \beta_i^{CMA}\text{CMA}
+\]
+
+\subsection{Factor-Based Portfolio Optimization}
+\label{subsec:factor_optimization}
+
+Decompose covariance:
+\[
+\Sigma = B F B^T + D
+\]
+where $B$ is factor loadings, $F$ is factor covariance, $D$ is idiosyncratic risk (diagonal).
+
+\textbf{Benefits:}
+\begin{itemize}
+    \item Dimension reduction: $k$ factors instead of $n(n+1)/2$ covariances
+    \item Improved estimation (more data per parameter)
+    \item Interpretability
+\end{itemize}
+
+\section{Performance Evaluation}
+\label{sec:performance}
+
+\subsection{Risk-Adjusted Metrics}
+\label{subsec:metrics}
+
+\begin{definition}[Sharpe Ratio]
+\[
+\text{Sharpe} = \frac{\E[r_p - r_f]}{\sigma_p}
+\]
+\end{definition}
+
+\begin{definition}[Information Ratio]
+\[
+\text{IR} = \frac{\E[r_p - r_b]}{\text{TE}}
+\]
+where $r_b$ is benchmark return, TE is tracking error.
+\end{definition}
+
+\begin{definition}[Sortino Ratio]
+\[
+\text{Sortino} = \frac{\E[r_p - r_f]}{\text{DD}}
+\]
+where DD is downside deviation: $\text{DD} = \sqrt{\E[\min(r_p - r_f, 0)^2]}$.
+\end{definition}
+
+\begin{definition}[Calmar Ratio]
+\[
+\text{Calmar} = \frac{\E[r_p]}{\text{MDD}}
+\]
+where MDD is maximum drawdown.
+\end{definition}
+
+\subsection{Performance Attribution}
+\label{subsec:attribution}
+
+Decompose portfolio return:
+\[
+r_p - r_b = \underbrace{\sum w_i (r_i - r_{b,i})}_{\text{Selection}} + \underbrace{\sum(w_i - w_{b,i})r_{b,i}}_{\text{Allocation}} + \underbrace{\text{Interaction}}_{\text{Cross-term}}
+\]
+
+\subsection{Benchmark-Relative Optimization}
+\label{subsec:benchmark}
+
+Minimize tracking error:
+\begin{align}
+\min_w \quad & (w - w_b)^T \Sigma (w - w_b) \\
+\text{s.t.} \quad & w^T\mu \geq \mu_{\text{target}} \\
+& w^T\mathbf{1} = 1
+\end{align}
+
+\section{Advanced Topics}
+\label{sec:advanced}
+
+\subsection{Robust Optimization}
+\label{subsec:robust}
+
+Account for uncertainty in parameters:
+\[
+\min_w \max_{\mu \in \mathcal{U}, \Sigma \in \mathcal{V}} \left[ -w^T\mu + \lambda w^T\Sigma w \right]
+\]
+where $\mathcal{U}$ and $\mathcal{V}$ are uncertainty sets.
+
+\subsection{Dynamic Portfolio Optimization}
+\label{subsec:dynamic}
+
+Continuous rebalancing in continuous time:
+\[
+\max_{w_t} \E\left[\int_0^T U(W_t) \, dt + U(W_T)\right]
+\]
+subject to wealth dynamics:
+\[
+dW_t = W_t[w_t^T(\mu - r_f\mathbf{1}) + r_f] \, dt + W_t w_t^T \Sigma^{1/2} \, dW_t
+\]
+
+Merton's solution for power utility:
+\[
+w^* = \frac{1}{\gamma}\Sigma^{-1}(\mu - r_f\mathbf{1})
+\]
+where $\gamma$ is risk aversion.
+
+\subsection{Multi-Period Optimization}
+\label{subsec:multiperiod}
+
+Stochastic programming formulation:
+\begin{align}
+\max_{\{w_t\}} \quad & \E\left[\sum_{t=0}^T \beta^t U(c_t)\right] \\
+\text{s.t.} \quad & W_{t+1} = (W_t - c_t)(1 + r_{p,t+1}) \\
+& r_{p,t+1} = w_t^T r_{t+1}
+\end{align}
+
+\section{Practical Implementation}
+\label{sec:implementation}
+
+\subsection{Data Requirements}
+\label{subsec:data_requirements}
+
+\begin{itemize}
+    \item \textbf{Minimum sample:} 30-60 months for covariance estimation
+    \item \textbf{Frequency:} Daily for short-horizon, monthly for long-horizon
+    \item \textbf{Data quality:} Adjust for corporate actions, handle missing values
+    \item \textbf{Survivorship bias:} Include delisted securities
+\end{itemize}
+
+\subsection{Rebalancing}
+\label{subsec:rebalancing}
+
+\textbf{Frequency:}
+\begin{itemize}
+    \item Calendar-based: monthly, quarterly, annually
+    \item Threshold-based: when drift exceeds tolerance
+\end{itemize}
+
+\textbf{Trade-off:}
+\begin{itemize}
+    \item More frequent: better tracking, higher costs
+    \item Less frequent: lower costs, more drift
+\end{itemize}
+
+\subsection{Backtesting}
+\label{subsec:backtesting}
+
+\textbf{Walk-Forward Testing:}
+\begin{enumerate}
+    \item Estimate parameters using $[t-T_{\text{est}}, t]$
+    \item Optimize portfolio at time $t$
+    \item Hold for period $[t, t+h]$
+    \item Roll forward and repeat
+\end{enumerate}
+
+\textbf{Metrics:}
+\begin{itemize}
+    \item Out-of-sample Sharpe ratio
+    \item Turnover
+    \item Maximum drawdown
+    \item Comparison to benchmarks (equal-weight, market-cap, 60/40)
+\end{itemize}
+
+\section{Conclusion}
+\label{sec:portfolio_conclusion}
+
+Portfolio optimization remains a cornerstone of quantitative finance despite its limitations. Key takeaways:
+
+\begin{enumerate}
+    \item \textbf{Diversification:} Free lunch—reduces risk without sacrificing return
+    \item \textbf{Estimation error:} Major practical challenge; use shrinkage, constraints
+    \item \textbf{Robustness:} Prefer methods less sensitive to inputs (e.g., risk parity)
+    \item \textbf{Constraints:} Often improve out-of-sample performance
+    \item \textbf{Transaction costs:} Cannot be ignored; drive optimal rebalancing
+    \item \textbf{Factor models:} Improve estimation and provide intuition
+    \item \textbf{Multiple objectives:} Balance return, risk, costs, tracking error
+\end{enumerate}
+
+The integration of robust estimation, factor models, machine learning for return prediction, and careful implementation creates a comprehensive framework for modern portfolio management.
+
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+\section{Summary of Key Contributions}
+\label{sec:summary}
+
+This technical report has provided a comprehensive treatment of quantitative finance, spanning probability theory, stochastic processes, stochastic calculus, machine learning, and portfolio optimization. Each chapter built upon the previous, creating an integrated framework:
+
+\textbf{Chapter 1:} Established probabilistic foundations with emphasis on limit theorems, moments, and financial risk metrics (VaR, CVaR, Sharpe ratio).
+
+\textbf{Chapter 2:} Developed continuous-time stochastic processes, Brownian motion, geometric Brownian motion, and mean-reverting processes essential for modeling financial dynamics.
+
+\textbf{Chapter 3:} Introduced stochastic calculus via Itô's lemma, derived the Black-Scholes equation, and provided comprehensive treatment of option Greeks and implied volatility.
+
+\textbf{Chapter 4:} Applied machine learning to financial time series, covering ARIMA models, GARCH volatility modeling, and LSTM neural networks with practical implementation guidelines.
+
+\textbf{Chapter 5:} Synthesized portfolio optimization theory from Markowitz mean-variance to modern robust methods, risk parity, and factor models.
+
+\section{Practical Applications}
+\label{sec:applications_summary}
+
+The methods developed have direct applications:
+\begin{itemize}
+    \item \textbf{Risk Management:} VaR/CVaR calculation, stress testing, volatility forecasting
+    \item \textbf{Trading:} Pairs trading, mean reversion strategies, delta hedging
+    \item \textbf{Derivative Pricing:} Options, structured products, exotic derivatives
+    \item \textbf{Portfolio Construction:} Asset allocation, factor investing, risk parity
+    \item \textbf{Forecasting:} Return prediction, volatility modeling, regime detection
+\end{itemize}
+
+\section{Future Directions}
+\label{sec:future}
+
+Quantitative finance continues to evolve:
+
+\begin{enumerate}
+    \item \textbf{Alternative Data:} Satellite imagery, social media, credit card transactions
+    \item \textbf{Reinforcement Learning:} Optimal execution, market making, dynamic hedging
+    \item \textbf{Explainable AI:} Interpretable models for regulatory compliance
+    \item \textbf{High-Frequency Trading:} Microsecond-level modeling and execution
+    \item \textbf{ESG Integration:} Incorporating environmental, social, governance factors
+    \item \textbf{Cryptocurrency:} Digital asset pricing and portfolio theory
+    \item \textbf{Climate Risk:} Modeling transition and physical climate risks
+\end{enumerate}
+
+\section{Final Remarks}
+\label{sec:final}
+
+Quantitative finance requires a unique combination of mathematical rigor, computational skill, and financial intuition. The tools presented in this report—from Itô's lemma to LSTM networks—represent decades of research and practical refinement. However, models are simplifications of reality and must be applied with understanding of their limitations and assumptions.
+
+Success in quantitative finance demands:
+\begin{itemize}
+    \item Rigorous mathematical thinking
+    \item Careful empirical validation
+    \item Robust implementation
+    \item Continuous learning and adaptation
+    \item Ethical responsibility
+\end{itemize}
+
+The transition from theoretical understanding to practical application is challenging but rewarding. This report provides the foundation; mastery comes through continuous practice, experimentation with real data, and learning from both successes and failures.
+
+\bibliographystyle{plain}
+\begin{thebibliography}{99}
+
+\bibitem{markowitz1952} H. Markowitz. Portfolio Selection. \textit{The Journal of Finance}, 7(1):77-91, 1952.
+
+\bibitem{black1973} F. Black and M. Scholes. The Pricing of Options and Corporate Liabilities. \textit{Journal of Political Economy}, 81(3):637-654, 1973.
+
+\bibitem{merton1973} R.C. Merton. Theory of Rational Option Pricing. \textit{Bell Journal of Economics and Management Science}, 4(1):141-183, 1973.
+
+\bibitem{engle1982} R.F. Engle. Autoregressive Conditional Heteroscedasticity with Estimates of the Variance of United Kingdom Inflation. \textit{Econometrica}, 50(4):987-1007, 1982.
+
+\bibitem{bollerslev1986} T. Bollerslev. Generalized Autoregressive Conditional Heteroskedasticity. \textit{Journal of Econometrics}, 31(3):307-327, 1986.
+
+\bibitem{hull2018} J.C. Hull. \textit{Options, Futures, and Other Derivatives}. 10th Edition. Pearson, 2018.
+
+\bibitem{shreve2004} S.E. Shreve. \textit{Stochastic Calculus for Finance II: Continuous-Time Models}. Springer, 2004.
+
+\bibitem{tsay2010} R.S. Tsay. \textit{Analysis of Financial Time Series}. 3rd Edition. Wiley, 2010.
+
+\bibitem{lopez2012} M. López de Prado. \textit{Advances in Financial Machine Learning}. Wiley, 2018.
+
+\bibitem{goodfellow2016} I. Goodfellow, Y. Bengio, A. Courville. \textit{Deep Learning}. MIT Press, 2016.
+
+\bibitem{black1992} F. Black and R. Litterman. Global Portfolio Optimization. \textit{Financial Analysts Journal}, 48(5):28-43, 1992.
+
+\bibitem{ledoit2004} O. Ledoit and M. Wolf. Honey, I Shrunk the Sample Covariance Matrix. \textit{The Journal of Portfolio Management}, 30(4):110-119, 2004.
+
+\bibitem{glosten1993} L.R. Glosten, R. Jagannathan, D.E. Runkle. On the Relation between the Expected Value and the Volatility of the Nominal Excess Return on Stocks. \textit{Journal of Finance}, 48(5):1779-1801, 1993.
+
+\bibitem{hochreiter1997} S. Hochreiter and J. Schmidhuber. Long Short-Term Memory. \textit{Neural Computation}, 9(8):1735-1780, 1997.
+
+\bibitem{fama2015} E.F. Fama and K.R. French. A Five-Factor Asset Pricing Model. \textit{Journal of Financial Economics}, 116(1):1-22, 2015.
+
+\end{thebibliography}
+
+\appendix
+
+\chapter{Python Implementation Guide}
+\label{app:python}
+
+\section{Required Libraries}
+
+\begin{lstlisting}[language=Python]
+# Core numerical and data manipulation
+import numpy as np
+import pandas as pd
+import scipy.stats as stats
+from scipy.optimize import minimize, brentq
+
+# Financial data
+import yfinance as yf
+
+# Time series and econometrics
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.stattools import adfuller, coint
+from arch import arch_model
+
+# Machine learning
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import mean_squared_error
+import tensorflow as tf
+from tensorflow import keras
+
+# Visualization
+import matplotlib.pyplot as plt
+import seaborn as sns
+\end{lstlisting}
+
+\section{Key Formulas Reference}
+
+\subsection{Risk Metrics}
+\begin{itemize}
+    \item \textbf{VaR (95\%):} \texttt{var = -np.percentile(returns, 5)}
+    \item \textbf{CVaR:} \texttt{cvar = -returns[returns <= -var].mean()}
+    \item \textbf{Sharpe:} \texttt{sharpe = np.sqrt(252) * returns.mean() / returns.std()}
+\end{itemize}
+
+\subsection{GARCH Estimation}
+\begin{lstlisting}[language=Python]
+from arch import arch_model
+model = arch_model(returns*100, vol='Garch', p=1, q=1)
+res = model.fit(disp='off')
+\end{lstlisting}
+
+\subsection{Portfolio Optimization}
+\begin{lstlisting}[language=Python]
+def portfolio_variance(weights, cov_matrix):
+    return weights.T @ cov_matrix @ weights
+
+def optimize_portfolio(mu, cov, target_return):
+    n = len(mu)
+    constraints = [
+        {'type': 'eq', 'fun': lambda w: np.sum(w) - 1},
+        {'type': 'eq', 'fun': lambda w: w @ mu - target_return}
+    ]
+    bounds = tuple((0, 1) for _ in range(n))
+    x0 = np.ones(n) / n
+    result = minimize(portfolio_variance, x0, 
+                     args=(cov,), method='SLSQP',
+                     bounds=bounds, constraints=constraints)
+    return result.x
+\end{lstlisting}
+
+\chapter{Mathematical Notation Reference}
+\label{app:notation}
+
+\begin{tabular}{ll}
+\toprule
+Symbol & Meaning \\
+\midrule
+$\Omega$ & Sample space \\
+$\mathcal{F}$ & $\sigma$-algebra (filtration) \\
+$\Prob$ & Probability measure \\
+$\E[\cdot]$ & Expectation operator \\
+$\Var(\cdot)$ & Variance \\
+$\Cov(\cdot,\cdot)$ & Covariance \\
+$W_t$ & Brownian motion (Wiener process) \\
+$dW_t$ & Brownian increment \\
+$\N(\mu, \sigma^2)$ & Normal distribution \\
+$\phi(\cdot)$, $\Phi(\cdot)$ & Standard normal PDF, CDF \\
+$r_t$ & Return at time $t$ \\
+$S_t$ & Stock price at time $t$ \\
+$\sigma_t$ & Volatility at time $t$ \\
+$\mu$ & Drift / expected return \\
+$\sigma$ & Volatility \\
+$\Sigma$ & Covariance matrix \\
+$w$ & Portfolio weights \\
+$\Delta, \Gamma, \mathcal{V}, \Theta, \rho$ & Option Greeks \\
+\bottomrule
+\end{tabular}
+
+\end{document}

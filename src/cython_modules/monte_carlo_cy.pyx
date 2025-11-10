@@ -13,7 +13,7 @@ Typical speedup: 10-50x faster than pure Python.
 import numpy as np
 cimport numpy as cnp
 cimport cython
-from libc.math cimport exp, sqrt, log
+from libc.math cimport exp, sqrt, log, cos
 from libc.stdlib cimport rand, RAND_MAX, srand
 from libc.time cimport time
 

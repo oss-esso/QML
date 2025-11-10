@@ -1,0 +1,454 @@
+\chapter{Stochastic Processes and Mean Reversion}
+\label{ch:stochastic_processes}
+
+\section{Introduction to Stochastic Processes}
+\label{sec:stoch_intro}
+
+Stochastic processes extend probability theory to model phenomena evolving randomly over time. In finance, asset prices, interest rates, and volatility are naturally modeled as stochastic processes.
+
+\subsection{Basic Definitions}
+\label{subsec:stoch_definitions}
+
+\begin{definition}[Stochastic Process]
+A stochastic process is a collection of random variables $\{X_t : t \in T\}$ indexed by time $t$, where $T$ is an index set (discrete or continuous).
+\end{definition}
+
+\begin{itemize}
+    \item \textbf{Discrete-time process:} $T = \{0, 1, 2, \ldots\}$ or $T = \mathbb{Z}$
+    \item \textbf{Continuous-time process:} $T = [0, \infty)$ or $T = \R$
+\end{itemize}
+
+\begin{definition}[Sample Path]
+A sample path (or trajectory) is a realization of the stochastic process, i.e., a function $t \mapsto X_t(\omega)$ for a fixed outcome $\omega \in \Omega$.
+\end{definition}
+
+\subsection{The Markov Property}
+\label{subsec:markov}
+
+\begin{definition}[Markov Process]
+A stochastic process $\{X_t\}$ has the Markov property if:
+\[
+\Prob(X_{t+s} \in A | \mathcal{F}_t) = \Prob(X_{t+s} \in A | X_t)
+\]
+for all $t, s \geq 0$ and measurable sets $A$.
+\end{definition}
+
+\textbf{Interpretation:} The future depends only on the present, not on the past—the process is "memoryless."
+
+\begin{definition}[Markov Chain]
+A discrete-time, discrete-state Markov process with state space $S = \{1, 2, \ldots, n\}$ and transition probabilities:
+\[
+P_{ij} = \Prob(X_{t+1} = j | X_t = i)
+\]
+The transition matrix $P = [P_{ij}]$ satisfies:
+\begin{itemize}
+    \item $P_{ij} \geq 0$ for all $i, j$
+    \item $\sum_{j=1}^n P_{ij} = 1$ for all $i$
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Chapman-Kolmogorov Equations]
+For a Markov chain, the $n$-step transition probabilities satisfy:
+\[
+P^{(n)}_{ij} = \sum_{k=1}^m P^{(r)}_{ik} P^{(n-r)}_{kj}
+\]
+In matrix form: $P^{(n)} = P^n$.
+\end{theorem}
+
+\textbf{Financial Application:} Credit rating transitions, regime-switching models for market states (bull/bear markets).
+
+\section{Random Walks}
+\label{sec:random_walks}
+
+\subsection{Simple Random Walk}
+\label{subsec:simple_rw}
+
+\begin{definition}[Simple Random Walk]
+Let $\{Z_i\}_{i=1}^{\infty}$ be i.i.d. random variables with $\Prob(Z_i = +1) = \Prob(Z_i = -1) = 1/2$. The simple random walk is:
+\[
+S_n = S_0 + \sum_{i=1}^n Z_i
+\]
+\end{definition}
+
+\textbf{Properties:}
+\begin{enumerate}
+    \item $\E[S_n] = S_0$ (martingale)
+    \item $\Var(S_n) = n$ (variance grows linearly with time)
+    \item $\E[(S_n - S_0)^2] = n$
+\end{enumerate}
+
+\subsection{Generalized Random Walk}
+\label{subsec:general_rw}
+
+For i.i.d. increments $\{Z_i\}$ with mean $\mu$ and variance $\sigma^2$:
+\[
+S_n = S_0 + \sum_{i=1}^n Z_i
+\]
+
+\textbf{Properties:}
+\begin{enumerate}
+    \item $\E[S_n] = S_0 + n\mu$
+    \item $\Var(S_n) = n\sigma^2$
+    \item By CLT: $\frac{S_n - S_0 - n\mu}{\sigma\sqrt{n}} \xrightarrow{d} \N(0,1)$ as $n \to \infty$
+\end{enumerate}
+
+\textbf{Financial Application:} Log-returns model: If $P_t$ is the stock price at time $t$, then:
+\[
+\log P_n = \log P_0 + \sum_{i=1}^n r_i
+\]
+where $r_i = \log(P_i/P_{i-1})$ are log-returns, often assumed i.i.d.
+
+\section{Brownian Motion}
+\label{sec:brownian_motion}
+
+Brownian motion (Wiener process) is the continuous-time limit of a random walk and the foundation of continuous-time finance.
+
+\subsection{Definition and Properties}
+\label{subsec:bm_definition}
+
+\begin{definition}[Standard Brownian Motion]
+A stochastic process $\{W_t : t \geq 0\}$ is a standard Brownian motion (Wiener process) if:
+\begin{enumerate}
+    \item $W_0 = 0$ almost surely
+    \item \textbf{Independent increments:} For $0 \leq s < t$, $W_t - W_s$ is independent of $\{W_u : u \leq s\}$
+    \item \textbf{Stationary increments:} $W_t - W_s \sim \N(0, t-s)$ for $t > s$
+    \item \textbf{Continuous paths:} $t \mapsto W_t$ is continuous almost surely
+\end{enumerate}
+\end{definition}
+
+\textbf{Key Properties:}
+\begin{enumerate}
+    \item $\E[W_t] = 0$
+    \item $\Var(W_t) = t$
+    \item $\Cov(W_s, W_t) = \min(s,t)$
+    \item $W_t$ is a martingale
+    \item Quadratic variation: $[W]_t = t$ (almost surely)
+\end{enumerate}
+
+\subsection{Scaling and Invariance Properties}
+\label{subsec:bm_scaling}
+
+\begin{proposition}[Scaling Property]
+If $\{W_t\}$ is a Brownian motion, then for any $c > 0$:
+\[
+\{W_{ct}\} \stackrel{d}{=} \{\sqrt{c} W_t\}
+\]
+where $\stackrel{d}{=}$ denotes equality in distribution.
+\end{proposition}
+
+\begin{proof}
+Both processes have the same finite-dimensional distributions:
+\begin{itemize}
+    \item $W_{ct} \sim \N(0, ct)$
+    \item $\sqrt{c} W_t \sim \N(0, c \cdot t)$
+\end{itemize}
+Independence and continuity properties also coincide.
+\end{proof}
+
+\textbf{Time-Inversion Property:}
+\[
+\{tW_{1/t}\} \stackrel{d}{=} \{W_t\}
+\]
+
+\subsection{Reflection Principle and First Passage Times}
+\label{subsec:bm_reflection}
+
+\begin{theorem}[Reflection Principle]
+Let $M_t = \max_{0 \leq s \leq t} W_s$ be the running maximum. Then:
+\[
+\Prob(M_t \geq a) = 2\Prob(W_t \geq a) = 2\left(1 - \Phi\left(\frac{a}{\sqrt{t}}\right)\right)
+\]
+\end{theorem}
+
+\textbf{Application:} Pricing barrier options, calculating knock-out probabilities.
+
+\section{Geometric Brownian Motion}
+\label{sec:gbm}
+
+Geometric Brownian Motion (GBM) is the standard model for stock prices.
+
+\subsection{Definition}
+\label{subsec:gbm_definition}
+
+\begin{definition}[Geometric Brownian Motion]
+A process $\{S_t\}$ follows GBM if it satisfies the stochastic differential equation (SDE):
+\[
+dS_t = \mu S_t \, dt + \sigma S_t \, dW_t
+\]
+where $\mu$ is the drift (expected return), $\sigma$ is the volatility, and $\{W_t\}$ is a Brownian motion.
+\end{definition}
+
+\subsection{Explicit Solution}
+\label{subsec:gbm_solution}
+
+The SDE has the explicit solution:
+\[
+S_t = S_0 \exp\left(\left(\mu - \frac{\sigma^2}{2}\right)t + \sigma W_t\right)
+\]
+
+\textbf{Derivation:} Apply Itô's lemma (Chapter 3) to $f(S_t) = \log S_t$.
+
+\textbf{Properties:}
+\begin{enumerate}
+    \item $S_t > 0$ for all $t$ (positivity preserved)
+    \item $\log S_t$ is normally distributed:
+    \[
+    \log S_t \sim \N\left(\log S_0 + \left(\mu - \frac{\sigma^2}{2}\right)t, \sigma^2 t\right)
+    \]
+    \item $\E[S_t] = S_0 e^{\mu t}$
+    \item $\Var(S_t) = S_0^2 e^{2\mu t}(e^{\sigma^2 t} - 1)$
+\end{enumerate}
+
+\textbf{Why GBM for Stock Prices?}
+\begin{itemize}
+    \item Prices remain positive
+    \item Returns $\frac{dS_t}{S_t}$ are normal (log-normal prices)
+    \item Consistent with empirical observations (over short horizons)
+\end{itemize}
+
+\section{Mean-Reverting Processes}
+\label{sec:mean_reversion}
+
+Many financial variables (interest rates, volatility, commodity prices, spreads) exhibit mean reversion rather than random walk behavior.
+
+\subsection{Ornstein-Uhlenbeck Process}
+\label{subsec:ou_process}
+
+\begin{definition}[Ornstein-Uhlenbeck Process]
+The OU process satisfies the SDE:
+\[
+dX_t = \theta(\mu - X_t) \, dt + \sigma \, dW_t
+\]
+where:
+\begin{itemize}
+    \item $\theta > 0$ is the mean reversion speed
+    \item $\mu$ is the long-term mean
+    \item $\sigma > 0$ is the volatility
+\end{itemize}
+\end{definition}
+
+\subsection{Properties of the OU Process}
+\label{subsec:ou_properties}
+
+The OU process has an explicit solution:
+\[
+X_t = \mu + (X_0 - \mu)e^{-\theta t} + \sigma \int_0^t e^{-\theta(t-s)} \, dW_s
+\]
+
+\textbf{Mean and Variance:}
+\begin{align}
+\E[X_t | X_0] &= \mu + (X_0 - \mu)e^{-\theta t} \\
+\Var(X_t | X_0) &= \frac{\sigma^2}{2\theta}(1 - e^{-2\theta t})
+\end{align}
+
+\textbf{Long-term Behavior:}
+\begin{itemize}
+    \item As $t \to \infty$: $\E[X_t] \to \mu$
+    \item Stationary distribution: $X_{\infty} \sim \N\left(\mu, \frac{\sigma^2}{2\theta}\right)$
+\end{itemize}
+
+\subsection{Half-Life of Mean Reversion}
+\label{subsec:half_life}
+
+The half-life is the time required for the process to close half the gap to its mean:
+
+\begin{definition}[Half-Life]
+The half-life $t_{1/2}$ satisfies:
+\[
+\E[X_{t_{1/2}} | X_0] - \mu = \frac{1}{2}(X_0 - \mu)
+\]
+\end{definition}
+
+From the mean equation:
+\[
+e^{-\theta t_{1/2}} = \frac{1}{2} \implies t_{1/2} = \frac{\ln 2}{\theta}
+\]
+
+\textbf{Interpretation:} Larger $\theta$ implies faster mean reversion (shorter half-life).
+
+\subsection{Parameter Estimation}
+\label{subsec:ou_estimation}
+
+For discrete observations $X_0, X_{\Delta t}, X_{2\Delta t}, \ldots, X_{n\Delta t}$, maximum likelihood estimates are:
+
+\begin{align}
+\hat{\theta} &= -\frac{1}{\Delta t}\log\left(\frac{S_{xy}}{S_{xx}}\right) \\
+\hat{\mu} &= \frac{S_y - \hat{\theta} S_x \Delta t}{n} \\
+\hat{\sigma}^2 &= \frac{2\hat{\theta}}{n(1-e^{-2\hat{\theta}\Delta t})}\sum_{i=1}^n (X_{i\Delta t} - \E[X_{i\Delta t}|X_{(i-1)\Delta t}])^2
+\end{align}
+
+where $S_x = \sum X_i$, $S_y = \sum \Delta X_i$, $S_{xx} = \sum X_i^2$, $S_{xy} = \sum X_i \Delta X_i$.
+
+\section{Cointegration and Pairs Trading}
+\label{sec:cointegration}
+
+\subsection{Cointegration Concept}
+\label{subsec:cointegration_def}
+
+\begin{definition}[Cointegration]
+Two non-stationary time series $\{X_t\}$ and $\{Y_t\}$ are cointegrated if there exists a linear combination:
+\[
+Z_t = Y_t - \beta X_t
+\]
+that is stationary, where $\beta$ is the cointegrating coefficient (hedge ratio).
+\end{definition}
+
+\subsection{Testing for Cointegration}
+\label{subsec:cointegration_test}
+
+\subsubsection{Engle-Granger Test}
+
+\begin{enumerate}
+    \item Estimate the cointegrating relationship by OLS:
+    \[
+    Y_t = \alpha + \beta X_t + \epsilon_t
+    \]
+    \item Test the residuals $\hat{\epsilon}_t = Y_t - \hat{\alpha} - \hat{\beta} X_t$ for stationarity using the Augmented Dickey-Fuller (ADF) test:
+    \[
+    \Delta \hat{\epsilon}_t = \gamma \hat{\epsilon}_{t-1} + \sum_{i=1}^p \delta_i \Delta \hat{\epsilon}_{t-i} + u_t
+    \]
+    \item Reject null hypothesis of non-stationarity if $t$-statistic for $\gamma$ is sufficiently negative
+\end{enumerate}
+
+\subsubsection{Augmented Dickey-Fuller Test}
+
+The ADF test examines whether a time series has a unit root:
+
+\textbf{Null hypothesis:} $H_0: \gamma = 0$ (unit root, non-stationary)
+
+\textbf{Alternative:} $H_1: \gamma < 0$ (stationary)
+
+Test statistic:
+\[
+t_{\text{ADF}} = \frac{\hat{\gamma}}{\text{SE}(\hat{\gamma})}
+\]
+
+Critical values are non-standard and depend on sample size and model specification.
+
+\subsection{Pairs Trading Strategy}
+\label{subsec:pairs_trading}
+
+\textbf{Strategy Overview:}
+\begin{enumerate}
+    \item Identify cointegrated pair $(X_t, Y_t)$ with spread $Z_t = Y_t - \beta X_t$
+    \item Model $Z_t$ as OU process
+    \item Trading signals:
+    \begin{itemize}
+        \item \textbf{Long spread:} When $Z_t < \mu - k\sigma_Z$ (buy $Y$, sell $\beta$ units of $X$)
+        \item \textbf{Short spread:} When $Z_t > \mu + k\sigma_Z$ (sell $Y$, buy $\beta$ units of $X$)
+        \item \textbf{Close position:} When $Z_t$ returns to $\mu \pm k'\sigma_Z$ where $k' < k$
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Typical Parameters:}
+\begin{itemize}
+    \item Entry threshold: $k = 2$ (2 standard deviations)
+    \item Exit threshold: $k' = 0.5$ (0.5 standard deviations)
+    \item Stop loss: $k_{\text{stop}} = 3$ (3 standard deviations)
+\end{itemize}
+
+\subsection{Risk Considerations}
+\label{subsec:pairs_risk}
+
+\begin{enumerate}
+    \item \textbf{Cointegration breakdown:} The relationship may not persist
+    \item \textbf{Parameter instability:} $\theta$, $\mu$, $\sigma$ may change over time
+    \item \textbf{Execution risk:} Spreads may widen before reverting
+    \item \textbf{Model risk:} OU assumption may not hold perfectly
+\end{enumerate}
+
+\textbf{Risk Management:}
+\begin{itemize}
+    \item Rolling window estimation of parameters
+    \item Position sizing based on volatility
+    \item Maximum holding period constraints
+    \item Portfolio diversification across multiple pairs
+\end{itemize}
+
+\section{Simulating Stochastic Processes}
+\label{sec:simulation}
+
+\subsection{Euler-Maruyama Method}
+\label{subsec:euler_maruyama}
+
+For a general SDE:
+\[
+dX_t = \mu(t, X_t) \, dt + \sigma(t, X_t) \, dW_t
+\]
+
+The Euler-Maruyama discretization is:
+\[
+X_{t+\Delta t} = X_t + \mu(t, X_t) \Delta t + \sigma(t, X_t) \sqrt{\Delta t} \, Z
+\]
+where $Z \sim \N(0,1)$.
+
+\textbf{Example—OU Process:}
+\[
+X_{i+1} = X_i + \theta(\mu - X_i)\Delta t + \sigma\sqrt{\Delta t} \, Z_i
+\]
+
+\subsection{Milstein Method}
+\label{subsec:milstein}
+
+The Milstein method provides higher-order accuracy by including the Itô correction:
+\[
+X_{t+\Delta t} = X_t + \mu \Delta t + \sigma \sqrt{\Delta t} Z + \frac{1}{2}\sigma\sigma'(Z^2 - 1)\Delta t
+\]
+where $\sigma' = \frac{\partial \sigma}{\partial x}$.
+
+\textbf{Example—GBM:}
+\[
+S_{i+1} = S_i + \mu S_i \Delta t + \sigma S_i \sqrt{\Delta t} Z_i + \frac{1}{2}\sigma^2 S_i (Z_i^2 - 1)\Delta t
+\]
+
+\subsection{Exact Simulation for Special Cases}
+\label{subsec:exact_simulation}
+
+For GBM, the exact solution is:
+\[
+S_t = S_0 \exp\left(\left(\mu - \frac{\sigma^2}{2}\right)t + \sigma W_t\right)
+\]
+
+Discretization:
+\[
+S_{t_{i+1}} = S_{t_i} \exp\left(\left(\mu - \frac{\sigma^2}{2}\right)\Delta t + \sigma\sqrt{\Delta t} \, Z_i\right)
+\]
+
+This avoids discretization error and maintains positivity exactly.
+
+\section{Applications to Financial Markets}
+\label{sec:applications}
+
+\subsection{Interest Rate Models}
+\label{subsec:interest_rate_models}
+
+\textbf{Vasicek Model:}
+\[
+dr_t = \theta(\mu - r_t) \, dt + \sigma \, dW_t
+\]
+An OU process for the short rate $r_t$.
+
+\textbf{Cox-Ingersoll-Ross (CIR) Model:}
+\[
+dr_t = \theta(\mu - r_t) \, dt + \sigma\sqrt{r_t} \, dW_t
+\]
+Ensures $r_t > 0$ if $2\theta\mu > \sigma^2$ (Feller condition).
+
+\subsection{Volatility Models}
+\label{subsec:volatility_models}
+
+Volatility often exhibits mean reversion. The Heston model uses:
+\[
+dv_t = \kappa(\theta - v_t) \, dt + \xi\sqrt{v_t} \, dW_t^v
+\]
+where $v_t$ is the variance process.
+
+\subsection{Commodity Prices}
+\label{subsec:commodity_prices}
+
+Many commodity prices are mean-reverting due to supply-demand dynamics:
+\[
+dP_t = \theta(\mu - \log P_t)P_t \, dt + \sigma P_t \, dW_t
+\]
+
+This completes the chapter on stochastic processes. We have established the framework for modeling dynamic financial variables, with particular emphasis on mean reversion—a critical property for many trading strategies. The next chapter introduces stochastic calculus, the mathematical machinery for working with these processes.
