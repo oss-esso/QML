@@ -28,6 +28,13 @@ extensions = [
         extra_compile_args=extra_compile_args,  # Platform-specific optimization
         extra_link_args=['-O3'],
     ),
+    Extension(
+        "src.cython_modules.black_scholes_cy",
+        ["src/cython_modules/black_scholes_cy.pyx"],
+        include_dirs=[np.get_include()],
+        extra_compile_args=extra_compile_args,  # Platform-specific optimization
+        extra_link_args=['-O3'],
+    ),
 ]
 
 setup(
